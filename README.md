@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Fashion Buddy — Build Log
 
 An AI fashion recommendation app: upload a photo or type a query, get matching
@@ -58,3 +59,7 @@ fashion-buddy/
 └── data/
     └── test.jpg          ← add your own test image here
 ```
+=======
+# fashionbuddy
+Fashion AI Stylist and Clothing Recommendation
+>>>>>>> 3bf51872ecfb584a4c6696623220606afab3512c
