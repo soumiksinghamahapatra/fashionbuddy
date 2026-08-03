@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fashion Buddy</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #2b241f;
+    --paper: #eee8db;
+    --card: #ffffff;
+    --clay: #b5502f;
+    --olive: #6b6a4f;
+    --line: #d9d0bd;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'Inter', sans-serif;
+    min-height: 100vh;
+  }
+  header {
+    padding: 48px 24px 32px;
+    text-align: center;
+    border-bottom: 1px solid var(--line);
+  }
+  header h1 {
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    font-size: clamp(2.2rem, 6vw, 3.2rem);
+    margin: 0 0 6px;
+    letter-spacing: -0.01em;
+  }
+  header p {
+    margin: 0;
+    color: var(--olive);
+    font-size: 0.95rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+  main {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 40px 24px 80px;
+  }
+  .panel {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    padding: 28px;
+    margin-bottom: 24px;
+  }
+  .panel h2 {
+    font-family: 'Fraunces', serif;
+    font-size: 1.3rem;
+    margin: 0 0 16px;
+    font-weight: 500;
+  }
+  .dropzone {
+    border: 1.5px dashed var(--line);
+    border-radius: 4px;
+    padding: 28px;
+    text-align: center;
+    cursor: pointer;
+    transition: border-color 0.15s ease, background 0.15s ease;
+  }
+  .dropzone:hover, .dropzone.drag {
+    border-color: var(--clay);
+    background: #faf6ee;
+  }
+  .dropzone span { display: block; color: var(--olive); font-size: 0.9rem; margin-top: 6px; }
+  #imagePreview { max-width: 100%; max-height: 220px; margin-top: 16px; border-radius: 4px; display: none; }
+  input[type="file"] { display: none; }
+  .text-row {
+    display: flex;
+    gap: 10px;
+  }
+  input[type="text"] {
+    flex: 1;
+    padding: 12px 14px;
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    font-family: inherit;
+    font-size: 0.95rem;
+    background: #fff;
+    color: var(--ink);
+  }
+  input[type="text"]:focus, .dropzone:focus-visible {
+    outline: 2px solid var(--clay);
+    outline-offset: 1px;
+  }
+  button {
+    background: var(--ink);
+    color: var(--paper);
+    border: none;
+    border-radius: 4px;
+    padding: 12px 20px;
+    font-family: inherit;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.15s ease;
+  }
+  button:hover { background: var(--clay); }
+  button:disabled { opacity: 0.5; cursor: default; }
+  #status {
+    margin: 8px 0 0;
+    color: var(--olive);
+    font-size: 0.9rem;
+    min-height: 1.2em;
+  }
+  .results { margin-top: 8px; }
+  .category-block {
+    margin-bottom: 28px;
+  }
+  .category-block .eyebrow {
+    font-size: 0.75rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--clay);
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+  .category-block .seen {
+    font-size: 0.88rem;
+    color: var(--olive);
+    margin: 0 0 14px;
+    font-style: italic;
+  }
+  .items {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+    gap: 14px;
+  }
+  .item-card {
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    padding: 14px;
+    background: #fff;
+  }
+  .item-card .name {
+    font-weight: 600;
+    font-size: 0.95rem;
+    margin: 0 0 4px;
+  }
+  .item-card .price {
+    color: var(--clay);
+    font-weight: 600;
+    font-size: 0.9rem;
+  }
+  .item-card .desc {
+    color: var(--olive);
+    font-size: 0.82rem;
+    margin: 8px 0 0;
+    line-height: 1.4;
+  }
+  .item-card a {
+    display: inline-block;
+    margin-top: 10px;
+    font-size: 0.8rem;
+    color: var(--ink);
+    text-decoration: underline;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Fashion Buddy</h1>
+  <p>Upload a look, or describe one</p>
+</header>
+
+<main>
+
+  <div class="panel">
+    <h2>Search by photo</h2>
+    <div class="dropzone" id="dropzone" tabindex="0">
+      <div id="dropText">Click to choose a photo, or drag one here</div>
+      <span>JPG or PNG of an outfit</span>
+      <img id="imagePreview" alt="Selected preview">
+    </div>
+    <input type="file" id="fileInput" accept="image/*">
+    <div style="margin-top:16px; text-align:right;">
+      <button id="imageSubmit" disabled>Find similar items</button>
+    </div>
+  </div>
+
+  <div class="panel">
+    <h2>Search by description</h2>
+    <div class="text-row">
+      <input type="text" id="textQuery" placeholder="e.g. a dress for a formal dinner">
+      <button id="textSubmit">Search</button>
+    </div>
+  </div>
+
+  <div class="panel">
+    <h2>Virtual try-on</h2>
+    <p style="color:var(--olive); font-size:0.85rem; margin-top:-8px;">
+      Upload your photo, describe what you want to wear, and we'll find a real product
+      and show you wearing it — this uses a free public AI demo, so it can take a minute
+      and occasionally fails if the demo is busy.
+    </p>
+    <div class="dropzone" id="personDropzone" tabindex="0" style="padding:18px;">
+      <div id="personDropText">Click to choose your photo, or drag one here</div>
+      <img id="personPreview" alt="Person preview" style="max-height:180px; display:none; margin-top:10px;">
+    </div>
+    <input type="file" id="personInput" accept="image/*">
+    <div class="text-row" style="margin-top:14px;">
+      <input type="text" id="tryonQuery" placeholder="e.g. black leather jacket">
+      <button id="tryonSubmit" disabled>Search options</button>
+    </div>
+    <div id="garmentOptions" class="items" style="margin-top:16px;"></div>
+    <div id="tryonResult" style="margin-top:16px; text-align:center;"></div>
+  </div>
+
+  <p id="status"></p>
+  <div class="results" id="results"></div>
+
+</main>
+
+<script>
+const personDropzone = document.getElementById('personDropzone');
+const personInput = document.getElementById('personInput');
+const personPreview = document.getElementById('personPreview');
+const personDropText = document.getElementById('personDropText');
+
+const tryonQuery = document.getElementById('tryonQuery');
+const tryonSubmit = document.getElementById('tryonSubmit');
+const garmentOptions = document.getElementById('garmentOptions');
+const tryonResult = document.getElementById('tryonResult');
+
+let personFile = null;
+
+function wireDropzone(dropzone, input, preview, dropText, onSelect) {
+  dropzone.addEventListener('click', () => input.click());
+  dropzone.addEventListener('keydown', (e) => { if (e.key === 'Enter') input.click(); });
+  dropzone.addEventListener('dragover', (e) => { e.preventDefault(); dropzone.classList.add('drag'); });
+  dropzone.addEventListener('dragleave', () => dropzone.classList.remove('drag'));
+  dropzone.addEventListener('drop', (e) => {
+    e.preventDefault();
+    dropzone.classList.remove('drag');
+    if (e.dataTransfer.files.length) onSelect(e.dataTransfer.files[0]);
+  });
+  input.addEventListener('change', () => { if (input.files.length) onSelect(input.files[0]); });
+}
+
+wireDropzone(personDropzone, personInput, personPreview, personDropText, (file) => {
+  personFile = file;
+  const reader = new FileReader();
+  reader.onload = (e) => { personPreview.src = e.target.result; personPreview.style.display = 'block'; personDropText.textContent = file.name; };
+  reader.readAsDataURL(file);
+  tryonSubmit.disabled = !(personFile && tryonQuery.value.trim());
+});
+
+tryonQuery.addEventListener('input', () => {
+  tryonSubmit.disabled = !(personFile && tryonQuery.value.trim());
+});
+
+// Step 1: search for several options
+tryonSubmit.addEventListener('click', async () => {
+  tryonSubmit.disabled = true;
+  tryonResult.innerHTML = '';
+  garmentOptions.innerHTML = '<p style="color:var(--olive)">Searching for options...</p>';
+  const formData = new FormData();
+  formData.append('query', tryonQuery.value.trim());
+  try {
+    const res = await fetch('/find_garments', { method: 'POST', body: formData });
+    const data = await res.json();
+    renderGarmentOptions(data.options || []);
+  } catch (err) {
+    garmentOptions.innerHTML = '<p style="color:var(--clay)">Something went wrong. Is the server still running?</p>';
+  }
+  tryonSubmit.disabled = false;
+});
+
+function renderGarmentOptions(options) {
+  if (!options.length) {
+    garmentOptions.innerHTML = '<p style="color:var(--olive)">No product images found for that. Try describing it differently.</p>';
+    return;
+  }
+  garmentOptions.innerHTML = options.map((opt, i) => `
+    <div class="item-card">
+      <img src="${opt.image_url}" style="width:100%; height:150px; object-fit:cover; border-radius:3px; margin-bottom:8px;">
+      <p class="name">${opt.product_title}</p>
+      <button data-index="${i}" class="pickOption" style="width:100%; margin-top:8px;">Try this on</button>
+    </div>
+  `).join('');
+
+  garmentOptions.querySelectorAll('.pickOption').forEach(btn => {
+    btn.addEventListener('click', () => generateTryon(options[parseInt(btn.dataset.index)]));
+  });
+}
+
+// Step 2: generate the try-on for the picked option
+async function generateTryon(option) {
+  tryonResult.innerHTML = '<p style="color:var(--olive)">Generating your try-on... this can take 30-90 seconds.</p>';
+  const formData = new FormData();
+  formData.append('person_photo', personFile);
+  formData.append('garment_image_url', option.image_url);
+  formData.append('product_link', option.product_link || '');
+  formData.append('product_title', option.product_title || '');
+  try {
+    const res = await fetch('/tryon_with_image', { method: 'POST', body: formData });
+    const data = await res.json();
+    if (data.error) {
+      tryonResult.innerHTML = `<p style="color:var(--clay)">${data.error}</p><p style="color:var(--olive); font-size:0.85rem;">The free demo can be flaky — try a different option above, or the same one again.</p>`;
+    } else {
+      let html = `<img src="${data.image_url}" style="max-width:100%; border-radius:4px;">`;
+      if (data.product_link) {
+        html += `<p style="margin-top:10px; font-size:0.85rem;">
+          ${data.product_title || ''} —
+          <a href="${data.product_link}" target="_blank" rel="noopener">View & buy</a>
+        </p>`;
+      }
+      tryonResult.innerHTML = html;
+    }
+  } catch (err) {
+    tryonResult.innerHTML = '<p style="color:var(--clay)">Something went wrong. Is the server still running?</p>';
+  }
+}
+
+const dropzone = document.getElementById('dropzone');
+const fileInput = document.getElementById('fileInput');
+const imagePreview = document.getElementById('imagePreview');
+const dropText = document.getElementById('dropText');
+const imageSubmit = document.getElementById('imageSubmit');
+const textQuery = document.getElementById('textQuery');
+const textSubmit = document.getElementById('textSubmit');
+const statusEl = document.getElementById('status');
+const resultsEl = document.getElementById('results');
+
+let selectedFile = null;
+
+dropzone.addEventListener('click', () => fileInput.click());
+dropzone.addEventListener('keydown', (e) => { if (e.key === 'Enter') fileInput.click(); });
+
+dropzone.addEventListener('dragover', (e) => { e.preventDefault(); dropzone.classList.add('drag'); });
+dropzone.addEventListener('dragleave', () => dropzone.classList.remove('drag'));
+dropzone.addEventListener('drop', (e) => {
+  e.preventDefault();
+  dropzone.classList.remove('drag');
+  if (e.dataTransfer.files.length) handleFile(e.dataTransfer.files[0]);
+});
+
+fileInput.addEventListener('change', () => {
+  if (fileInput.files.length) handleFile(fileInput.files[0]);
+});
+
+function handleFile(file) {
+  selectedFile = file;
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    imagePreview.src = e.target.result;
+    imagePreview.style.display = 'block';
+    dropText.textContent = file.name;
+  };
+  reader.readAsDataURL(file);
+  imageSubmit.disabled = false;
+}
+
+imageSubmit.addEventListener('click', async () => {
+  if (!selectedFile) return;
+  setLoading(true, 'Looking at your photo...');
+  const formData = new FormData();
+  formData.append('file', selectedFile);
+  try {
+    const res = await fetch('/recommend/image', { method: 'POST', body: formData });
+    const data = await res.json();
+    renderResults(data.results);
+  } catch (err) {
+    statusEl.textContent = 'Something went wrong. Is the server still running?';
+  }
+  setLoading(false);
+});
+
+textSubmit.addEventListener('click', async () => {
+  const query = textQuery.value.trim();
+  if (!query) return;
+  setLoading(true, 'Searching...');
+  const formData = new FormData();
+  formData.append('query', query);
+  try {
+    const res = await fetch('/recommend/text', { method: 'POST', body: formData });
+    const data = await res.json();
+    renderResults(data.results);
+  } catch (err) {
+    statusEl.textContent = 'Something went wrong. Is the server still running?';
+  }
+  setLoading(false);
+});
+
+textQuery.addEventListener('keydown', (e) => { if (e.key === 'Enter') textSubmit.click(); });
+
+function setLoading(isLoading, message) {
+  imageSubmit.disabled = isLoading || !selectedFile;
+  textSubmit.disabled = isLoading;
+  statusEl.textContent = isLoading ? message : '';
+  if (isLoading) resultsEl.innerHTML = '';
+}
+
+function renderResults(results) {
+  if (!results || !results.length) {
+    resultsEl.innerHTML = '<p style="color:var(--olive)">No matches found.</p>';
+    return;
+  }
+  resultsEl.innerHTML = results.map(block => `
+    <div class="category-block">
+      <div class="eyebrow">${block.category}</div>
+      <p class="seen">${block.description}</p>
+      <div class="items">
+        ${block.matches.map(m => `
+          <div class="item-card">
+            <p class="name">${m.product_name}</p>
+            ${m.price ? `<p class="price">$${m.price}</p>` : ''}
+            <p class="desc">${m.description}</p>
+            <a href="${m.link}" target="_blank" rel="noopener">View item</a>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+  `).join('');
+}
+</script>
+
+</body>
+</html>
