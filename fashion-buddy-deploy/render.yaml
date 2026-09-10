@@ -1,0 +1,19 @@
+# Render "Blueprint" config — Render reads this automatically when you
+# connect a repo that contains it, and sets up the whole service for you
+# (no manual clicking through settings needed, other than filling in the
+# 3 secret values below, which Render will prompt you for).
+
+services:
+  - type: web
+    name: fashion-buddy
+    runtime: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: GOOGLE_API_KEY
+        sync: false
+      - key: TAVILY_API_KEY
+        sync: false
+      - key: HF_TOKEN
+        sync: false
